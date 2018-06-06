@@ -1,8 +1,8 @@
 Batch script for Named Entity Recognition
 
 # Folder Setup
-── project folder
-├── stanford-er-2018-02-27
+── project folder\n
+├── stanford-er-2018-02-27\n
 ├── file1.txt
 ├── file2.txt
 ├── file1.txt

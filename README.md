@@ -8,7 +8,7 @@ This will need 1 or more text file (ending in .txt) to work.
 You will need to download [Stanford Named Entity Recognizer](https://nlp.stanford.edu/software/CRF-NER.shtml#Download)
 
 ## Folder Setup
-This script, as is, will run Stanford NER on every text file within a folder. This expects that the stanford-ner-2018-02-27 folder, all of the text files, and the batchner.sh script are all within the same folder.
+This script, as is, will run Stanford NER on every text (.txt) file within a folder. This expects that the stanford-ner-2018-02-27 folder, all of the text files, and the batchner.sh script are all within the same folder.
 
 ```
 ├── project folder

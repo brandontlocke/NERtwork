@@ -17,7 +17,7 @@ You will need to download [Stanford Named Entity Recognizer](https://nlp.stanfor
 As is, the script will run Stanford NER on every text (.txt) file within a folder. This expects that the stanford-ner-2018-02-27 folder, all of the text files, and the batchner.sh script are all within the same folder.
 
 ```
-├── project folder
+├──🗂  project folder
 |   ├──🗂 stanford-ner-2018-02-27
 |   └──batchner.sh
 |   └──file1.txt

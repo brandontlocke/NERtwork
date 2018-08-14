@@ -1,6 +1,6 @@
 #!/bin/sh
 
-echo "entity,doc,type,count" > entities.csv
+echo "doc,entity,type,count" > entities.csv
 
 for file in *.txt
 

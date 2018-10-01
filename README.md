@@ -17,7 +17,7 @@ As is, the script will run Stanford NER on every text (.txt) file within a folde
 ```
 ├──🗂 project folder
 |   ├──🗂 stanford-ner-2018-02-27
-|   └──batchner.sh [or batchner-win.sh on Windows]
+|   └──batchner.sh
 |   └──file1.txt
 |   └──file2.txt
 |   └──file3.txt
@@ -38,9 +38,10 @@ This will take a bit to run (4-5 files will likely take about a minute), but wil
 
 ### Windows
 Download and install [Cygwin](https://www.cygwin.com/install.html). Once your files are arranged as above:
-1. Open Cygwin
-2. Navigate to the folder containing these files (using `$ cd`) [if you have a folder 'project' on the Desktop, type (without the $) `$ cd /cygdrive/c/Users/YOUR-USERNAME/Desktop/project`.]
-3. Type `$ sh batchner-win.sh`
+1. Open batchner.sh in a text editor, remove the `#` at the start of line 8 (starts with `nertext=$(java -mx600m -cp`...), and add a `#` to line 9 (starts with `nertext=$(stanford-ner`...)
+2. Open Cygwin
+3. Navigate to the folder containing these files (using `$ cd`) [if you have a folder 'project' on the Desktop, type (without the $) `$ cd /cygdrive/c/Users/YOUR-USERNAME/Desktop/project`.]
+4. Type `$ sh batchner-win.sh`
 This will take a bit to run (4-5 files will likely take about a minute), but will print all of the results into a file in the same folder called `entities.csv`
 
 ## Notes

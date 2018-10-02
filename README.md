@@ -9,7 +9,7 @@ The final spreadsheet (called entities.csv) will have the text filename, the ent
 ## Requirements
 This script only works on text (.txt) files, but it will work on as many text files as you'd like without any further interaction on your part.
 
-You will need to download [Stanford Named Entity Recognizer](https://nlp.stanford.edu/software/CRF-NER.shtml#Download)
+You will need to download [Stanford Named Entity Recognizer](https://nlp.stanford.edu/software/CRF-NER.shtml#Download) and also [script in this repository](https://github.com/brandontlocke/batchner/blob/master/batchner.sh).
 
 ## Folder Setup
 As is, the script will run Stanford NER on every text (.txt) file within a folder. This expects that the NER folder (as of this writing, the `stanford-ner-2018-02-27` folder), all of the text files, and the batchner.sh script are all within the same folder. (Note: you do not have to change the names of the .txt files—the filenames below are just for demonstration)

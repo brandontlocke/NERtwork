@@ -12,11 +12,13 @@ This script only works on text (.txt) files, but it will work on as many text fi
 You will need to download [Stanford Named Entity Recognizer](https://nlp.stanford.edu/software/CRF-NER.shtml#Download) and also [script in this repository](https://github.com/brandontlocke/batchner/blob/master/batchner.sh).
 
 ## Folder Setup
-As is, the script will run Stanford NER on every text (.txt) file within a folder. This expects that the NER folder (as of this writing, the `stanford-ner-2018-02-27` folder), all of the text files, and the batchner.sh script are all within the same folder. (Note: you do not have to change the names of the .txt files—the filenames below are just for demonstration)
+As is, the script will run Stanford NER on every text (.txt) file within a folder. This expects that all of the text files and the batchner.sh script are all within the same folder, and that the NER folder (as of this writing, the `stanford-ner-2018-10-16`) is in the same directory as the folder of files. 
+
+(Note: you do not have to change the names of the .txt files—the filenames below are just for demonstration)
 
 ```
+├──🗂 stanford-ner-2018-10-16
 ├──🗂 project folder
-|   ├──🗂 stanford-ner-2018-02-27
 |   └──batchner.sh
 |   └──file1.txt
 |   └──file2.txt

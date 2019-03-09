@@ -48,3 +48,5 @@ This will take a bit to run (4-5 files will likely take about a minute), but wil
 
 ## Notes
 As new versions of Stanford NER come out, the filepath will change and will need to be updated
+
+This would have have been possible without Bill Turkel's [Named Entity Recognition with Command Line Tools in Linux](https://williamjturkel.net/2013/06/30/named-entity-recognition-with-command-line-tools-in-linux/)

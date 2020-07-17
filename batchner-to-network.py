@@ -4,7 +4,7 @@ import pandas as pd
 import argparse
 
 # parse the command line info
-DEFAULT = dict(subset='none', minweight=0, proj_name='nertwork')
+DEFAULT = dict(subset='none', minweight=0, proj_name='batchnertonetwork')
 parser = argparse.ArgumentParser(description='Test app')
 parser.add_argument('-i', required=True)
 parser.add_argument('-subset', action="store", default=DEFAULT['subset'])
@@ -50,7 +50,7 @@ def getNodeLabels(edgelist, batchnerID):
     nodes_labels = nodes_labels.drop_duplicates().reset_index(drop=True)
     return(nodes_labels)
 
-def createNetwork(batchnerlist, subset='none', minweight=0, proj_name='nertwork'):
+def createNetwork(batchnerlist, subset='none', minweight=0, proj_name='batchnertonetwork'):
     '''Creates a projected network from batchner output and optionall filters by entitytype and minimum weight. Subset options are 'none', all', 'person', 'location', 'organization'. Subset will default to only making the full graph. Minweight will accept any number from 0 to 99999999.'''    
     # loads a batchner output csv as a dataframe
     batchner=pd.read_csv(batchnerlist, low_memory=False)
@@ -61,13 +61,13 @@ def createNetwork(batchnerlist, subset='none', minweight=0, proj_name='nertwork'
         print("The minweight parameter is not a number, or is too high.")
     
     # checkes to make sure the subset is an acceptable option
-    if subset == 'none' or 'all' or 'person' or 'location' or 'organization':
+    if subset in ('none', 'all', 'person', 'location', 'organization'):
         pass
     else:
         print("The subset parameter is unrecognized. Potential options are 'none', 'all', 'person', 'location', 'organization'")
     
     # check to see if a full graph should be created
-    if subset == 'none' or 'all':
+    if subset in ('none', 'all'):
         batchnerID=addID(batchner)
         edgelist = edgesFromProjectedGraph(batchnerID)
 
@@ -91,7 +91,7 @@ def createNetwork(batchnerlist, subset='none', minweight=0, proj_name='nertwork'
         
     else:
         pass
-    
+  
     # if all subsets are being created, enter into a loop
     if subset == 'all':
         # provide all three subsets for the loop
@@ -117,9 +117,9 @@ def createNetwork(batchnerlist, subset='none', minweight=0, proj_name='nertwork'
                 edgelist.to_csv(proj_name + '_ner_' + entityType + '_proj_edges.csv', index=False)
                 nodelist = getNodeLabels(edgelist, batchnerID)
                 nodelist.to_csv(proj_name + '_ner_' + entityType + '_proj_nodes.csv', index=False) 
-      
+     
     # if only one subset is being created, filter and run through
-    elif subset == 'person' or 'location' or 'organization':
+    elif subset in ('person', 'location', 'organization'):
         batchnerID=addID(batchner.loc[batchner['entityType'] == subset])
         edgelist=edgesFromProjectedGraph(batchnerID)
         
@@ -140,7 +140,8 @@ def createNetwork(batchnerlist, subset='none', minweight=0, proj_name='nertwork'
             edgelist.to_csv(proj_name+ '_ner_' + subset + '_proj_edges.csv', index=False)
             nodelist = getNodeLabels(edgelist, batchnerID)
             nodelist.to_csv(proj_name+ '_ner_' + subset + '_proj_nodes.csv', index=False)    
+
     else:
         pass
-    
+
 createNetwork(args.i, args.subset, args.minweight, args.proj_name)

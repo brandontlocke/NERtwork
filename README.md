@@ -13,7 +13,7 @@ Software required:
 * [Cygwin](https://www.cygwin.com/install.html) (Windows only)
 * [OpenRefine](https://openrefine.org/)
 
-	\* Python, Pandas, and NetworkX are all installed by default with [Anaconda](https://www.anaconda.com/).
+\* Python, Pandas, and NetworkX are all installed by default with [Anaconda](https://www.anaconda.com/).
 
 * Any network visualization software ([Palladio](https://hdlab.stanford.edu/palladio/) is great for beginners or basic exploration, [Gephi](https://gephi.org/) is recommended for more experienced users, or for more extensive research project. Anything that will accept an edge and node CSV will work, including Cytoscape, D3.js, or Flourish).
 

@@ -7,11 +7,14 @@ NERtwork is a collection of scripts to help you create a network graph of co-occ
 Software required:
 
 * [Stanford Named Entity Recognizer](https://nlp.stanford.edu/software/CRF-NER.shtml)
-* [Python 3](https://www.python.org/)
+* [Python 3](https://www.python.org/)\*
+* [Pandas](https://pandas.pydata.org/)\*
+* [NetworkX](https://networkx.github.io/)\*
 * [Cygwin](https://www.cygwin.com/install.html) (Windows only)
 * [OpenRefine](https://openrefine.org/)
-* [Pandas](https://pandas.pydata.org/)
-* [NetworkX](https://networkx.github.io/)
+
+\* Python, Pandas, and NetworkX are all installed by default with [Anaconda](https://www.anaconda.com/).
+
 * Any network visualization software ([Palladio](https://hdlab.stanford.edu/palladio/) is great for beginners or basic exploration, [Gephi](https://gephi.org/) is recommended for more experienced users, or for more extensive research project. Anything that will accept an edge and node CSV will work, including Cytoscape, D3.js, or Flourish).
 
 ### Process
@@ -110,7 +113,7 @@ Takes a batchner output, creates a [bipartite projected network](https://en.wiki
 
 ### Options
 * `-i` [**REQUIRED**] sets the location of the batchner file you want to construct a network from
-* `-proj_name` [recommended] allows you to give your project a name that will be at the beginning of the filename. (default = batchnertonetwork)
+* `-proj_name` [recommended] allows you to give your project a name that will be at the beginning of the filename. (default = nertwork)
 * `-subset` [optional] allows you to limit your network to only specific types of networks (default = none)
 	* `none` will create a network. including all types of entities, 
 	* `person`, `location`, or `organization` will create a network of only that type of entity

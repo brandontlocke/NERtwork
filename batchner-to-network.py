@@ -4,7 +4,7 @@ import pandas as pd
 import argparse
 
 # parse the command line info
-DEFAULT = dict(subset='none', minweight=0, proj_name='batchnertonetwork')
+DEFAULT = dict(subset='none', minweight=0, proj_name='nertwork')
 parser = argparse.ArgumentParser(description='Test app')
 parser.add_argument('-i', required=True)
 parser.add_argument('-subset', action="store", default=DEFAULT['subset'])
@@ -50,7 +50,7 @@ def getNodeLabels(edgelist, batchnerID):
     nodes_labels = nodes_labels.drop_duplicates().reset_index(drop=True)
     return(nodes_labels)
 
-def createNetwork(batchnerlist, subset='none', minweight=0, proj_name='batchnertonetwork'):
+def createNetwork(batchnerlist, subset='none', minweight=0, proj_name='nertwork'):
     '''Creates a projected network from batchner output and optionall filters by entitytype and minimum weight. Subset options are 'none', all', 'person', 'location', 'organization'. Subset will default to only making the full graph. Minweight will accept any number from 0 to 99999999.'''    
     # loads a batchner output csv as a dataframe
     batchner=pd.read_csv(batchnerlist, low_memory=False)

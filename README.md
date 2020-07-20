@@ -7,7 +7,7 @@ NERtwork is a collection of scripts to help you create a network graph of co-occ
 Software required:
 
 * [Stanford Named Entity Recognizer](https://nlp.stanford.edu/software/CRF-NER.shtml)
-* [Anaconda](https://www.anaconda.com/) (not strictly required, but includes the following 3 requirements, which can be installed separately)
+* [Anaconda](https://www.anaconda.com/) (strongly recommended, especially for Windows - includes the following 3 requirements, which can be installed separately)
 	* [Python 3](https://www.python.org/)
 	* [Pandas](https://pandas.pydata.org/)
 	* [NetworkX](https://networkx.github.io/)
@@ -92,7 +92,7 @@ Once that is done, you'll likely have some duplicate data. For example, you may 
 This Python script will save you the time of finding all of these duplicates and adding the counts together. 
 
 1. Save [batchner-collapse.py](https://github.com/brandontlocke/NERtwork/blob/master/batchner-collapser.py) to your machine
-2. In a terminal window, navigate to the directory with your batcher-to-network.py file and type `python batchner-collapse.py path/to/your/refined/batchner/file`
+2. In a command line window (Terminal for Mac, Anaconda for Windows), navigate to the directory with your batcher-to-network.py file and type `python batchner-collapse.py path/to/your/refined/batchner/file`
 3. The resulting spreadsheet with merged and re-counted entities will append `_refined` to the end of the filename.
 
 *Thank you to Devin Higgins for creating this script*
@@ -119,7 +119,7 @@ Takes a batchner output, creates a [bipartite projected network](https://en.wiki
 
 ### Instructions
 1. Save the [batchner-to-network.py file](https://github.com/brandontlocke/NERtwork/blob/master/batchner-to-network.py) to your machine
-2. In a terminal window, navigate to the directory with your batchner-to-network.py file and type `python batchner-to-network.py -i=path/to/your/batchner/file`, plus any other flags you may want
+2. In a command line window (Terminal for Mac, Anaconda for Windows), navigate to the directory with your batchner-to-network.py file and type `python batchner-to-network.py -i=path/to/your/batchner/file`, plus any other flags you may want
 
 #### Examples
 * `python batchner-to-network.py -i=data/my_dataset.csv -proj_name=my_dataset -subset=person -minweight=5` 

@@ -118,7 +118,7 @@ Takes a batchner output, creates a [bipartite projected network](https://en.wiki
 	* `none` will create a network. including all types of entities, 
 	* `person`, `location`, or `organization` will create a network of only that type of entity
 	* `all` will create 4 networks: all types, person, location, and organization. 
-* `-minweight` [optional] will filter out entity relationships with weights below a specified number. This can be helpful in really large graphs. (default = 0)
+* `-minweight` [optional] will filter out entity relationships with weights below a specified number. This filter is applied at the end of the process, so projection is done based on the complete list, and the output is filtered by the projected weight. This can be helpful in really large graphs. (default = 0)
 
 
 ### Instructions

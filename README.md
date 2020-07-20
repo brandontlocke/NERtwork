@@ -28,22 +28,20 @@ Software required:
 
 This is a single command-line script that will call the Stanford Named Entity Recognizer on each text file in a folder, count unique entities, and print the results into a spreadsheet.
 
-The final spreadsheet (called entities.csv) will have the text filename, the entity recognized, the type of entity (organization, location, person), and the number of times that each entity occurred as that type\* within the document.
-
-\*It's possible for the same word to be tagged as more than one type of entity within a document.
+The final spreadsheet (called entities.csv) will have the text filename, the entity recognized, the type of entity (organization, location, person), and the number of times that each entity occurred as that type within the document. _Note: It's possible for the same word to be tagged as more than one type of entity within a document._
 
 ### Requirements
 This script only works on text (.txt) files, but it will work on as many text files as you'd like without any further interaction on your part.
 
-You will need to download [Stanford Named Entity Recognizer](https://nlp.stanford.edu/software/CRF-NER.shtml#Download) and also [the batchner.sh script](https://github.com/brandontlocke/NERtwork/blob/master/batchner.sh).
+You will need to download [Stanford Named Entity Recognizer](https://nlp.stanford.edu/software/CRF-NER.shtml#Download) and rename the folder `stanford-ner`, and also [the batchner.sh script](https://github.com/brandontlocke/NERtwork/blob/master/batchner.sh).
 
 ### Folder Setup
-As is, the script will run Stanford NER on every text (.txt) file within a folder. This expects that all of the text files and the batchner.sh script are all within the same folder, and that the NER folder (as of this writing, the `stanford-ner-4.0.0`) is in the same directory as the folder of files. 
+As is, the script will run Stanford NER on every text (.txt) file within a folder. This expects that all of the text files and the batchner.sh script are all within the same folder, and that the  Stanford NER folder is in the same directory as the folder of files. **Make sure you have renamed the stanford-ner folder**
 
 (Note: you do not have to change the names of the .txt files—the filenames below are just for demonstration)
 
 ```
-├──🗂 stanford-ner-4.0.0
+├──🗂 stanford-ner
 ├──🗂 project_folder
 |   └──batchner.sh
 |   └──file1.txt
@@ -73,7 +71,7 @@ Download and install [Cygwin](https://www.cygwin.com/install.html). Once your fi
 This will take a bit to run (it should generally do 4-5 files per minute), but will print all of the results into a file in the same folder called `entities.csv`
 
 ### Notes
-As new versions of Stanford NER come out, the folder name will change and you may need to update your batchner.sh file so that portion of text on lines 8 or 9 that say `stanford-ner-X.X.X` match the folder name
+The purpose of renaming the stanford-ner folder is that every new version has a different folder name, meaning this script needs to be updated every few months with every new Stanford NER release. Changing the folder name on your hard drive means that this script needs significantly less maintenance.
 
 This would not have have been possible without Bill Turkel's [Named Entity Recognition with Command Line Tools in Linux](https://williamjturkel.net/2013/06/30/named-entity-recognition-with-command-line-tools-in-linux/)
 
@@ -94,7 +92,7 @@ Once that is done, you'll likely have some duplicate data. For example, you may 
 This Python script will save you the time of finding all of these duplicates and adding the counts together. 
 
 1. Save [batchner-collapse.py](https://github.com/brandontlocke/NERtwork/blob/master/batchner-collapser.py) to your machine
-2. In a terminal window, navigate to the directory with your batcher-to-network.py file and type `python batchner-collapse.py path/to/your/batchner/file`
+2. In a terminal window, navigate to the directory with your batcher-to-network.py file and type `python batchner-collapse.py path/to/your/refined/batchner/file`
 3. The resulting spreadsheet with merged and re-counted entities will append `_refined` to the end of the filename.
 
 *Thank you to Devin Higgins for creating this script*

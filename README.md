@@ -19,10 +19,11 @@ Software required:
 *More detailed steps are provided in the sections below*
 
 1. Run [batchner.sh](#batchnersh) over a folder of text files. It will create a spreadsheet with a count of every named entity in every document in the folder.
-2. Use [OpenRefine](https://openrefine.org/) or spreadsheet software to normalize, or correct and combine, entities that are the same (e.g. New York, NY, N.Y.). This step is optional, but will *significantly* improve your results.
-3. Run [batchner-collapse.py](#batchner-collapsepy) to consolidate duplicate entities creating by refinement. Only use this if you completed step 2.
-4. Run [batchner-to-network.csv](#batchner-to-networkcsv) to perform a bipartite network projection and save the resulting node and edge lists.
-5. Import node and edge lists into network visualization software of your choice!
+2. [Optional, but *strongly* encouraged] Use [OpenRefine](https://openrefine.org/) or spreadsheet software to normalize, or correct and combine, entities that are the same (e.g. New York, NY, N.Y.). This will *significantly* improve your results.
+3. [Required if you completed step 2] Run [batchner-collapse.py](#batchner-collapsepy) to consolidate duplicate entities creating by refinement.
+4. [Optional] Join any relevant metadata so that you may subset the collection based on archival series, author, year, or whatever other metadata is useful. This will vary greatly on the metadata you have, but you can look to the [Fannie Lou Hamer Papers metadata join script](https://github.com/FannieLouHamerPapers/code/blob/master/flh-metadatamerge.py) as an example.
+5. Run [batchner-to-network.csv](#batchner-to-networkcsv) to perform a bipartite network projection and save the resulting node and edge lists.
+6. Import node and edge lists into network visualization software of your choice!
 
 ## batchner.sh
 

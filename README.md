@@ -98,6 +98,9 @@ This Python script will save you the time of finding all of these duplicates and
 
 *Thank you to Devin Higgins for creating this script*
 
+### Adding metadata
+At this point, it may be beneficial to include any relevant metadata you may have about your documents so that you may subset the collection based on archival series, author, year, or whatever other metadata is useful. This will vary greatly on the metadata you have, but you can look to the [Fannie Lou Hamer Papers metadata join script](https://github.com/FannieLouHamerPapers/code/blob/master/flh-metadatamerge.py) as an example for joining, and the [Fannie Lou Hamer Papers series split script](https://github.com/FannieLouHamerPapers/code/blob/master/flh-series-split.py) as an example for subsetting based on metadata.
+
 ## batchner-to-network.csv
 
 Takes a batchner output, creates a [bipartite projected network](https://en.wikipedia.org/wiki/Bipartite_network_projection) of named entity co-occurrences, and saves node and edge lists as CSV. In other words, it counts the co-occurrence of named entities within a set of documents and represents them as connected nodes in a network.

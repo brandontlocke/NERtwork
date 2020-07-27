@@ -2,19 +2,30 @@ import networkx as nx
 from networkx.algorithms import bipartite
 import pandas as pd
 import argparse
+import re
 
 # parse the command line info
-DEFAULT = dict(subset='none', minweight=0, proj_name='batchnertonetwork')
+DEFAULT = dict(subcol='none', subname='none', entity='none', minweight=0, proj_name='NERtwork')
 parser = argparse.ArgumentParser(description='Test app')
 parser.add_argument('-i', required=True)
-parser.add_argument('-subset', action="store", default=DEFAULT['subset'])
+parser.add_argument('-subcol', action="store", type=str, default=DEFAULT['subcol'])
+parser.add_argument('-subname', action="store", type=str.lower, default=DEFAULT['subname'])
+parser.add_argument('-entity', action="store", type=str.lower, default=DEFAULT['entity'])
 parser.add_argument('-minweight', action="store", type=int, default=DEFAULT['minweight'])
 parser.add_argument('-proj_name', action="store", default=DEFAULT['proj_name'])
 args = parser.parse_args()
 
-def addID(batchner):
+def addID(batchner, subcol, subname):
     '''This adds an id and entity label to the existing batchner dataframe. Requires a batchner output.'''
     # create a list of all unique entities in the set
+    if subcol=='none':
+        pass
+    else:
+        if batchner[subcol].dtypes != str:
+            batchner[subcol]=batchner[subcol].apply(str)
+        else:
+            pass
+        batchner=batchner.loc[batchner[subcol].str.contains(subname, flags=re.IGNORECASE, regex=False)]
     nodes=batchner[['entity', 'entityType']].drop_duplicates().reset_index(drop=True)
     # create a dataframe of each entity with a unique numbered identifier
     nodes_list = pd.DataFrame({'id': nodes.index, 'label': nodes.entity, 'entityType': nodes.entityType})
@@ -50,8 +61,8 @@ def getNodeLabels(edgelist, batchnerID):
     nodes_labels = nodes_labels.drop_duplicates().reset_index(drop=True)
     return(nodes_labels)
 
-def createNetwork(batchnerlist, subset='none', minweight=0, proj_name='batchnertonetwork'):
-    '''Creates a projected network from batchner output and optionall filters by entitytype and minimum weight. Subset options are 'none', all', 'person', 'location', 'organization'. Subset will default to only making the full graph. Minweight will accept any number from 0 to 99999999.'''    
+def createNetwork(batchnerlist, subcol='none', subname='none', entity='none', minweight=0, proj_name='batchnertonetwork'):
+    '''Creates a projected network from batchner output and optional filters by subset, entitytype and minimum weight. Subset searches for subname in subcol. Entity options are 'none', all', 'person', 'location', 'organization'. Entity will default to only making the full graph. Minweight will accept any number from 0 to 99999999.'''    
     # loads a batchner output csv as a dataframe
     batchner=pd.read_csv(batchnerlist, low_memory=False)
     # checks to see if minweight is a reasonable number
@@ -60,15 +71,36 @@ def createNetwork(batchnerlist, subset='none', minweight=0, proj_name='batchnert
     else:
         print("The minweight parameter is not a number, or is too high.")
     
-    # checkes to make sure the subset is an acceptable option
-    if subset in ('none', 'all', 'person', 'location', 'organization'):
+    # if subset is not none, makes sure the column exists
+    if subcol =='none':
+        pass
+    elif subcol in list(batchner.columns.values):
+        # append subname to proj_name so that final files with have subset information in them
+        # this is a lazy way to add this name to the files, but it prevents me from adding if/else statements in like 10 places and doubling the number of lines
+        proj_name=proj_name + '_' + subname
+        # makes sure the subset name exists within the subset column, if one is specified
+        if subname in str(batchner[subcol].values).lower():
+            pass        
+        else:
+            print("The subname does not exist in the subcol, or you have not entered a subname. Please check your data and make sure everything is spelled correctly.")
+            exit()
+    else:
+        print("The subcol does not exist in the dataset. This option is case-sensitive. Options are")
+        for col in (batchner.columns.values):
+            print(col)
+        exit()
+
+   
+    # checks to make sure the entity is an acceptable option
+    if entity in ('none', 'all', 'person', 'location', 'organization'):
         pass
     else:
-        print("The subset parameter is unrecognized. Potential options are 'none', 'all', 'person', 'location', 'organization'")
+        print("The entity parameter is unrecognized. Potential options are 'none', 'all', 'person', 'location', 'organization'")
+        exit()
     
     # check to see if a full graph should be created
-    if subset in ('none', 'all'):
-        batchnerID=addID(batchner)
+    if entity in ('none', 'all'):
+        batchnerID=addID(batchner, subcol, subname)
         edgelist = edgesFromProjectedGraph(batchnerID)
 
         # if there's a weight filter, check edge weight and print; otherwise, print them all
@@ -92,12 +124,12 @@ def createNetwork(batchnerlist, subset='none', minweight=0, proj_name='batchnert
     else:
         pass
   
-    # if all subsets are being created, enter into a loop
-    if subset == 'all':
-        # provide all three subsets for the loop
+    # if all entities are being created, enter into a loop
+    if entity == 'all':
+        # provide all three entities for the loop
         entitylist = ['person', 'organization', 'location']        
         for entityType in entitylist:
-            batchnerID=addID(batchner.loc[batchner['entityType'] == entityType])
+            batchnerID=addID(batchner.loc[batchner['entityType'] == entityType], subcol, subname)
             edgelist = edgesFromProjectedGraph(batchnerID)
             
             # if there's a weight filter, check edge weight and print; otherwise, print them all
@@ -118,9 +150,9 @@ def createNetwork(batchnerlist, subset='none', minweight=0, proj_name='batchnert
                 nodelist = getNodeLabels(edgelist, batchnerID)
                 nodelist.to_csv(proj_name + '_ner_' + entityType + '_proj_nodes.csv', index=False) 
      
-    # if only one subset is being created, filter and run through
-    elif subset in ('person', 'location', 'organization'):
-        batchnerID=addID(batchner.loc[batchner['entityType'] == subset])
+    # if only one entity is being created, filter and run through
+    elif entity in ('person', 'location', 'organization'):
+        batchnerID=addID(batchner.loc[batchner['entityType'] == entity, subcol, subname])
         edgelist=edgesFromProjectedGraph(batchnerID)
         
         # if there's a weight filter, check edge weight and print; otherwise, print them all
@@ -130,18 +162,18 @@ def createNetwork(batchnerlist, subset='none', minweight=0, proj_name='batchnert
             filtered_nodes=getNodeLabels(filtered_edges, batchnerID)
             # make sure something met the minweight
             if len(filtered_edges) < 2:
-                print('No ' + subset + ' edges met the minimum weight requirement')
+                print('No ' + entity + ' edges met the minimum weight requirement')
             else:
                 #print node and edgelists to csv
-                filtered_edges.to_csv(proj_name+'_ner_' + subset + '_proj_edges_freq'+ str(minweight) + '.csv', index=False)
-                filtered_nodes.to_csv(proj_name+'_ner_' + subset + '_proj_nodes_freq'+ str(minweight) + '.csv', index=False)
+                filtered_edges.to_csv(proj_name+'_ner_' + entity + '_proj_edges_freq'+ str(minweight) + '.csv', index=False)
+                filtered_nodes.to_csv(proj_name+'_ner_' + entity + '_proj_nodes_freq'+ str(minweight) + '.csv', index=False)
         else:
             #print node & edge list to csv
-            edgelist.to_csv(proj_name+ '_ner_' + subset + '_proj_edges.csv', index=False)
+            edgelist.to_csv(proj_name+ '_ner_' + entity + '_proj_edges.csv', index=False)
             nodelist = getNodeLabels(edgelist, batchnerID)
-            nodelist.to_csv(proj_name+ '_ner_' + subset + '_proj_nodes.csv', index=False)    
+            nodelist.to_csv(proj_name+ '_ner_' + entity + '_proj_nodes.csv', index=False)    
 
     else:
         pass
 
-createNetwork(args.i, args.subset, args.minweight, args.proj_name)
+createNetwork(args.i, args.subcol, args.subname, args.entity, args.minweight, args.proj_name)

@@ -16,7 +16,7 @@ parser.add_argument('-minweight', action="store", type=int, default=DEFAULT['min
 parser.add_argument('-proj_name', action="store", default=DEFAULT['proj_name'])
 args = parser.parse_args()
 
-def inputValidator(batchner, subcol, subname, entity, minweight, proj_name):
+def input_validator(batchner, subcol, subname, entity, minweight, proj_name):
     # checks to see if minweight is a reasonable number
     if minweight in range(0,99999999):
         pass
@@ -56,7 +56,7 @@ def inputValidator(batchner, subcol, subname, entity, minweight, proj_name):
     return (proj_name)
 
 
-def addID(batchner, subcol, subname):
+def add_id(batchner, subcol, subname):
     '''This adds an id and entity label to the existing batchner dataframe. Requires a batchner output.'''
     # create a list of all unique entities in the set
     if subcol=='none':
@@ -78,7 +78,7 @@ def addID(batchner, subcol, subname):
     )
     return(batchnerID)
 
-def edgesFromProjectedGraph(batchnerID):
+def edges_from_projected_graph(batchnerID):
     '''Creates a projected graph and saves the edges as a dataframe.'''
     # create empty multigraph - multigraph is an undirected graph with parallel edges
     G = nx.MultiGraph()
@@ -90,7 +90,7 @@ def edgesFromProjectedGraph(batchnerID):
     edgelist = nx.to_pandas_edgelist(full_graph)
     return(edgelist)
 
-def getNodeLabels(edgelist, batchnerID):
+def get_node_labels(edgelist, batchnerID):
     '''Creates a dataframe of nodes with desired metadata. Expects an edgelist and listing of node ids/labels'''
     # creates a list of all unique nodes in the edgelist
     nodes=pd.DataFrame({'id':edgelist['source'].append(edgelist['target']).drop_duplicates()})
@@ -102,14 +102,14 @@ def getNodeLabels(edgelist, batchnerID):
     nodes_labels = nodes_labels.drop_duplicates().reset_index(drop=True)
     return(nodes_labels)
 
-def createNetwork(batchneroutput, subcol, subname, entity, minweight, proj_name):
+def create_network(batchneroutput, subcol, subname, entity, minweight, proj_name):
     '''Creates a projected network from batchner output and optional filters by subset, entitytype and minimum weight. Subset searches for subname in subcol. Entity options are 'none', all', 'person', 'location', 'organization'. Entity will default to only making the full graph. Minweight will accept any number from 0 to 99999999.'''    
     
     # loads a batchner output csv as a dataframe
     batchner=pd.read_csv(batchneroutput, low_memory=False)
 
     # makes sure all flags are valid and updates project name if needed
-    proj_name=inputValidator(batchner, subcol, subname, entity, minweight, proj_name)
+    proj_name=input_validator(batchner, subcol, subname, entity, minweight, proj_name)
  
     # provide all three entities plus all for the loop 
     if entity == 'all':
@@ -123,16 +123,16 @@ def createNetwork(batchneroutput, subcol, subname, entity, minweight, proj_name)
     # loop through list and create edge lists for each entity
     for entityType in entitylist:
         if entityType == 'all':
-            batchnerID=addID(batchner, subcol, subname)
+            batchnerID=add_id(batchner, subcol, subname)
         else:
-            batchnerID=addID(batchner.loc[batchner['entityType'] == entityType], subcol, subname)
-        edgelist = edgesFromProjectedGraph(batchnerID)
+            batchnerID=add_id(batchner.loc[batchner['entityType'] == entityType], subcol, subname)
+        edgelist = edges_from_projected_graph(batchnerID)
         
         # if there's a weight filter, select by edge weight and print; otherwise, print them all
         if minweight!= 0:
             # filter 
             filtered_edges=edgelist.loc[edgelist.weight >= minweight]
-            filtered_nodes=getNodeLabels(filtered_edges, batchnerID)
+            filtered_nodes=get_node_labels(filtered_edges, batchnerID)
             # make sure something met the minweight
             if len(filtered_edges) < 2:
                 print('No ' + entityType + ' edges met the minimum weight requirement')
@@ -144,7 +144,7 @@ def createNetwork(batchneroutput, subcol, subname, entity, minweight, proj_name)
         else:
             # print node & edgelist to csv
             edgelist.to_csv(proj_name + '_ner_' + entityType + '_proj_edges.csv', index=False)
-            nodelist = getNodeLabels(edgelist, batchnerID)
+            nodelist = get_node_labels(edgelist, batchnerID)
             nodelist.to_csv(proj_name + '_ner_' + entityType + '_proj_nodes.csv', index=False) 
 
-createNetwork(args.i, args.subcol, args.subname, args.entity, args.minweight, args.proj_name)
+create_network(args.i, args.subcol, args.subname, args.entity, args.minweight, args.proj_name)

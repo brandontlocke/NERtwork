@@ -6,17 +6,19 @@ import re
 pd.set_option('mode.chained_assignment', None)
 
 # parse the command line info
-DEFAULT = dict(subcol='none', subname='none', entity='none', minweight=0, proj_name='NERtwork')
-parser = argparse.ArgumentParser(description='Test app')
+DEFAULT = dict(subcol='none', subname='none', entity='none', minweight=0, proj_name='NERtwork', out='csv')
+parser = argparse.ArgumentParser(description='NERtwork')
 parser.add_argument('-i', required=True)
 parser.add_argument('-subcol', action="store", type=str, default=DEFAULT['subcol'])
 parser.add_argument('-subname', action="store", type=str.lower, default=DEFAULT['subname'])
 parser.add_argument('-entity', action="store", type=str.lower, default=DEFAULT['entity'])
 parser.add_argument('-minweight', action="store", type=int, default=DEFAULT['minweight'])
 parser.add_argument('-proj_name', action="store", default=DEFAULT['proj_name'])
+parser.add_argument('-out', action="store", type=str.lower, default=DEFAULT['out'])
 args = parser.parse_args()
 
-def input_validator(batchner, subcol, subname, entity, minweight, proj_name):
+def input_validator(batchner, subcol, subname, entity, minweight, proj_name, out):
+    '''This checks each of the arguments taken by the parser. It also adds the subset term to the project name, if there is one.'''
     # checks to see if minweight is a reasonable number
     if minweight in range(0,99999999):
         pass
@@ -46,18 +48,24 @@ def input_validator(batchner, subcol, subname, entity, minweight, proj_name):
         exit()
    
     # checks to make sure the entity is an acceptable option
-    if entity in ('none', 'all', 'person', 'location', 'organization'):
+        if entity in ('none', 'all', 'person', 'location', 'organization'):
+            pass
+        else:
+            print("The entity parameter is unrecognized. Potential options are 'none', 'all', 'person', 'location', 'organization'")
+            exit()
+    
+    # checks to make sure the out is an acceptable option
+    if out in ('csv', 'gexf'):
         pass
     else:
-        print("The entity parameter is unrecognized. Potential options are 'none', 'all', 'person', 'location', 'organization'")
+        print("The out parameter is unrecognized. Potential options are 'csv' or 'gexf'")
         exit()
     
     # return the project name, updated if needed
     return (proj_name)
 
-
 def add_id(batchner, subcol, subname):
-    '''This adds an id and entity label to the existing batchner dataframe. Requires a batchner output.'''
+    '''This adds an id and entity label to the existing batchner dataframe. It also conducts a subset search, if there is one..'''
     # create a list of all unique entities in the set
     if subcol=='none':
         pass
@@ -78,73 +86,94 @@ def add_id(batchner, subcol, subname):
     )
     return(batchnerID)
 
-def edges_from_projected_graph(batchnerID):
+def create_projected_graph(batchnerID, minweight, entityType):
     '''Creates a projected graph and saves the edges as a dataframe.'''
     # create empty multigraph - multigraph is an undirected graph with parallel edges
     G = nx.MultiGraph()
     # import edge dataframe and create network
     G = nx.from_pandas_edgelist(batchnerID, source='doc', target='id', edge_attr=True)
     # project the graph onto entities, removing documents from the graph
-    full_graph = bipartite.weighted_projected_graph(G, batchnerID.id)
-    # convert the projected edge list
-    edgelist = nx.to_pandas_edgelist(full_graph)
-    return(edgelist)
+    projected_graph = bipartite.weighted_projected_graph(G, batchnerID.id)
+    if minweight!=0:
+        projected_graph=nx.Graph( [ (u,v,d) for u,v,d in projected_graph.edges(data=True) if d['weight']>minweight] )
+    else:
+        pass
+    for col in ('label', 'entityType'):
+        node_atts = dict(zip(batchnerID.id, batchnerID[col],))
+        nx.set_node_attributes(projected_graph, node_atts, col)
+    return(projected_graph)
 
-def get_node_labels(edgelist, batchnerID):
-    '''Creates a dataframe of nodes with desired metadata. Expects an edgelist and listing of node ids/labels'''
+def create_csv(projected_graph, batchnerID, entityType, minweight, proj_name):
+    '''Takes the projected graph and creates node and edge lists'''
+    # convert the projected edge list
+    edgelist = nx.to_pandas_edgelist(projected_graph)
     # creates a list of all unique nodes in the edgelist
     nodes=pd.DataFrame({'id':edgelist['source'].append(edgelist['target']).drop_duplicates()})
     # takes each node and looks up the corresponding labels
-    nodes_labels = pd.merge(nodes[['id']],
+    nodelist = pd.merge(nodes[['id']],
                        batchnerID[['id','label', 'entityType']],
                        on='id'
     )
-    nodes_labels = nodes_labels.drop_duplicates().reset_index(drop=True)
-    return(nodes_labels)
+    nodelist = nodelist.drop_duplicates().reset_index(drop=True)
 
-def create_network(batchneroutput, subcol, subname, entity, minweight, proj_name):
-    '''Creates a projected network from batchner output and optional filters by subset, entitytype and minimum weight. Subset searches for subname in subcol. Entity options are 'none', all', 'person', 'location', 'organization'. Entity will default to only making the full graph. Minweight will accept any number from 0 to 99999999.'''    
+    # if there's a weight filter, include in file name; if not, don't include weight in filename
+    if len(edgelist) >1:
+        if minweight!= 0:
+            # print node and edgelists to csv
+            edgelist.to_csv(proj_name + '_ner_' + entityType + '_proj_edges_freq' + str(minweight) + '.csv', index=False)
+            nodelist.to_csv(proj_name + '_ner_' + entityType + '_proj_nodes_freq' + str(minweight) + '.csv', index=False)
+        else:
+            # print node & edgelist to csv
+            edgelist.to_csv(proj_name + '_ner_' + entityType + '_proj_edges.csv', index=False)
+            nodelist.to_csv(proj_name + '_ner_' + entityType + '_proj_nodes.csv', index=False)
+    else:
+        print('No ' + entityType + ' edges met the minimum weight requirement')
+
+def create_gexf(projected_graph, proj_name, entityType, minweight):
+    '''Saves the projected graph as a gexf file'''
+    if projected_graph.number_of_edges() != 0:    
+        if minweight!=0:
+            nx.write_gexf(projected_graph, proj_name + '_ner_' + entityType + '_proj_freq' + str(minweight) + '.gexf')
+        else:
+            nx.write_gexf(projected_graph, proj_name + '_ner_' + entityType + '_proj.gexf')
+    else:
+        print('No ' + entityType + ' edges met the minimum weight requirement')
+
+def create_networks(batchneroutput, subcol, subname, entity, minweight, proj_name, out):
+    '''Creates a loop based on entity filtering. In each loop, constructs a projected graph and distributes to the desired output. '''
     
     # loads a batchner output csv as a dataframe
     batchner=pd.read_csv(batchneroutput, low_memory=False)
 
     # makes sure all flags are valid and updates project name if needed
-    proj_name=input_validator(batchner, subcol, subname, entity, minweight, proj_name)
+    proj_name=input_validator(batchner, subcol, subname, entity, minweight, proj_name, out)
  
-    # provide all three entities plus all for the loop 
+    # set up loop to run on one or multiple entities
     if entity == 'all':
         entitylist = ['all', 'person', 'organization', 'location']
-    # set none to all entity types
+    # set none to all entity type
     elif entity =='none':
         entitylist=['all']
     # set entity list to specified single entity
     else:
         entitylist=[entity]   
-    # loop through list and create edge lists for each entity
+    # loop through list of entityTypes desired
     for entityType in entitylist:
+        # add id number to entities and filter for entitytype and subset
         if entityType == 'all':
             batchnerID=add_id(batchner, subcol, subname)
         else:
             batchnerID=add_id(batchner.loc[batchner['entityType'] == entityType], subcol, subname)
-        edgelist = edges_from_projected_graph(batchnerID)
         
-        # if there's a weight filter, select by edge weight and print; otherwise, print them all
-        if minweight!= 0:
-            # filter 
-            filtered_edges=edgelist.loc[edgelist.weight >= minweight]
-            filtered_nodes=get_node_labels(filtered_edges, batchnerID)
-            # make sure something met the minweight
-            if len(filtered_edges) < 2:
-                print('No ' + entityType + ' edges met the minimum weight requirement')
-                exit()
-            else:
-                # print node and edgelists to csv
-                filtered_edges.to_csv(proj_name + '_ner_' + entityType + '_proj_edges_freq' + str(minweight) + '.csv', index=False)
-                filtered_nodes.to_csv(proj_name + '_ner_' + entityType + '_proj_nodes_freq' + str(minweight) + '.csv', index=False)
+        # create a projected graph
+        projected_graph=create_projected_graph(batchnerID, minweight, entityType)
+        
+        # send to appropriate output
+        if out=='csv':
+            create_csv(projected_graph, batchnerID, entityType, minweight, proj_name)
+        elif out=='gexf':
+            create_gexf(projected_graph, proj_name, entityType, minweight)
         else:
-            # print node & edgelist to csv
-            edgelist.to_csv(proj_name + '_ner_' + entityType + '_proj_edges.csv', index=False)
-            nodelist = get_node_labels(edgelist, batchnerID)
-            nodelist.to_csv(proj_name + '_ner_' + entityType + '_proj_nodes.csv', index=False) 
+            pass
 
-create_network(args.i, args.subcol, args.subname, args.entity, args.minweight, args.proj_name)
+create_networks(args.i, args.subcol, args.subname, args.entity, args.minweight, args.proj_name, args.out)

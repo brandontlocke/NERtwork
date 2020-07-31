@@ -2,7 +2,7 @@
 
 ## Overview
 
-NERtwork is a collection of scripts to help you create a network graph of co-occurring named entities using open source tools. This is done by using Stanford Named Entity Recognizer to identify named entities in the documents, then using NetworkX to create a [bipartite projected network](https://en.wikipedia.org/wiki/Bipartite_network_projection) and exporting the node and edge lists for use in network visualization tools.
+NERtwork is a collection of scripts to help you create a network graph of co-occurring named entities using open source tools. This is done by using Stanford Named Entity Recognizer to identify named entities in the documents, then using NetworkX to create a [bipartite projected network](https://en.wikipedia.org/wiki/Bipartite_network_projection), which is exportable in different formats..
 
 Software required:
 
@@ -105,30 +105,32 @@ The next script allows limited subsetting (explained below), but for more comple
 
 ## batchner-to-network.py
 
-Takes a batchner output, creates a [bipartite projected network](https://en.wikipedia.org/wiki/Bipartite_network_projection) of named entity co-occurrences, and saves node and edge lists as CSV. In other words, it counts the co-occurrence of named entities within a set of documents and represents them as connected nodes in a network.
+Takes a batchner output, creates a [bipartite projected network](https://en.wikipedia.org/wiki/Bipartite_network_projection) of named entity co-occurrences, and saves them in your desired file format. In other words, it counts the co-occurrence of named entities within a set of documents and represents them as connected nodes in a network.
 
 ### Requirements
-* [NetworkX](https://networkx.github.io/)
-* [Pandas](https://pandas.pydata.org/)
-* Python 3
+* Anaconda (or NetworkX, Pandas, Python)
 * A batchner output
 
 ### Options
 * `-i` [**REQUIRED**] sets the location of the batchner file you want to construct a network from
 * `-proj_name` [recommended] allows you to give your project a name that will be at the beginning of the filename. (default = nertwork)
 * `-subcol` [optional] specifies the column you want to use to create a subset. This is case-sensitive. If you use subcol, you must also use subname. (default = none)
-* `-subname` [optional; required if subcol used] searches in the subcol for a character, word or phrase to create a subset of the data. This is also included in the filename, if used. (default = none)
+* `-subname` [optional; required if subcol used] searches in the subcol for a character, word or phrase to create a subset of the data. If your search term includes spaces or special characters put quotes or double quotes on each side of the term. The search string is also included in the filename, if used. (default = none)
 * `-entity` [optional] allows you to limit your network to only specific types of networks (default = none)
 	* `none` will create a network. including all types of entities, 
 	* `person`, `location`, or `organization` will create a network of only that type of entity
 	* `all` will create 4 networks: all types, person, location, and organization.
 * `-minweight` [optional] will filter out entity relationships with weights below a specified number. This filter is applied at the end of the process, so projection is done based on the complete list, and the output is filtered by the projected weight. This can be helpful in really large graphs. (default = 0)
+* `-out` [optional] will determine what type of output files you want (default = csv)
+	* `csv` creates two csvs—an edge list and a node list
+	* `gexf` creats a GEXF (Graph Exchange XML Format) file
 
 ### Subsetting
 You can create networks from subsets of the data using `subcol` to select a column and `subname` to facet on characters in that column. Although this will technically work on any column, this is likely not helpful unless you have joined additional data, or want to use a segment of information from the doc name.
 * `subcol` must perfectly match (including case) the name of the column. 
 * `subname` is a case-insensitive literal string search that only needs to match on part of a field in a dataset. (Ex: `-subname=correspondence` will match 'Correspondence: Letter to J. Smith' as well as 'Memo: Regarding earlier correspondence')
 * If you have spaces or special characters, add single or double quotes to your argument (note: some special characters will still cause problems and you may need to your metadata or use another method for subsetting)
+* Your search term will be stripped of spaces and special characters (if any) and added to the final filename.
 * Warning: If the data in the `subcol` column is not a string, it will be converted to a string for matching. This also means that, for the time being at least, you cannot search for numbers above/below a point or dates before/after a date.
 * If you want to facet on multiple terms or in multiple columns, if you have special characters you need to find, or you need to facet on something other than a string, I recommend using spreadsheet software, OpenRefine, or Python to create alternative subset data to use.
 * **This is a brand new feature and has not been tested very much. If you've run into a problem that isn't described above, or have a recommended solution to improve this, please file an issue**

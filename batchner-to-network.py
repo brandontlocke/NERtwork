@@ -17,13 +17,6 @@ parser.add_argument('-proj_name', action="store", default=DEFAULT['proj_name'])
 parser.add_argument('-out', action="store", type=str.lower, default=DEFAULT['out'])
 args = parser.parse_args()
 
-# strip quotation marks from subname if used
-if subname[0] in ("'", '"') and subname[-1] in ("'", '"'):
-    subname=subname.strip("\'")
-    subname=subname.strip('\"')
-else:
-    pass
-
 def input_validator(batchner, subcol, subname, entity, minweight, proj_name, out):
     '''This checks each of the arguments taken by the parser. It also adds the subset term to the project name, if there is one.'''
     # checks to see if minweight is a reasonable number
@@ -148,6 +141,12 @@ def create_gexf(projected_graph, proj_name, entityType, minweight):
 
 def create_networks(batchneroutput, subcol, subname, entity, minweight, proj_name, out):
     '''Creates a loop based on entity filtering. In each loop, constructs a projected graph and distributes to the desired output. '''
+    # strip quotation marks from subname if used
+    if subname[0] in ("'", '"') and subname[-1] in ("'", '"'):
+        subname=subname.strip("\'")
+        subname=subname.strip('\"')
+    else:
+        pass
     
     # loads a batchner output csv as a dataframe
     batchner=pd.read_csv(batchneroutput, low_memory=False)

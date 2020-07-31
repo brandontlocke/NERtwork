@@ -17,6 +17,13 @@ parser.add_argument('-proj_name', action="store", default=DEFAULT['proj_name'])
 parser.add_argument('-out', action="store", type=str.lower, default=DEFAULT['out'])
 args = parser.parse_args()
 
+# strip quotation marks from subname if used
+if subname[0] in ("'", '"') and subname[-1] in ("'", '"'):
+    subname=subname.strip("\'")
+    subname=subname.strip('\"')
+else:
+    pass
+
 def input_validator(batchner, subcol, subname, entity, minweight, proj_name, out):
     '''This checks each of the arguments taken by the parser. It also adds the subset term to the project name, if there is one.'''
     # checks to see if minweight is a reasonable number

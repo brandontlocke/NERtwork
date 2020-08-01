@@ -36,8 +36,14 @@ This script only works on text (.txt) files, but it will work on as many text fi
 
 You will need to download [Stanford Named Entity Recognizer](https://nlp.stanford.edu/software/CRF-NER.shtml#Download) and rename the folder `stanford-ner`, and also [the batchner.sh script](https://github.com/brandontlocke/NERtwork/blob/master/batchner.sh). **Do not forget to rename the folder (or edit the .sh file or this will not work.**
 
-### Folder Setup
-As is, the script will run Stanford NER on every text (.txt) file within a folder. This expects that all of the text files and the batchner.sh script are all within the same folder, and that the stanford-ner folder is in the same directory as the folder of files. **Make sure you have renamed the stanford-ner folder**
+### Options
+* `-s` [required for Windows, optional for Mac/Unix] specifies what kind of operating system you're using. Options are 'unix' (Mac, Linux, Windows Subsystem for Linux) or 'win' for Windows. (default = unix)
+* `-l` specifies language — right now eng is the only option. (default = eng)
+* `-d` [optional] specifies the directory where the text files are. If you don't use it, it will run on .txt files in the current working directory. Can be a relative or absolute path, and should end in a slash. (default = '') *see Default Folder Setup for more info*
+* `-n` [optional] specifies the directory where `ner.sh` and `stanford-ner.jar` are. If you don't use it, it will look for a folder named `stanford-ner` on directory above the current working directory. Can be a relative or absolute path, and should end in a slash. (default = '../stanford-ner/') *see Default Folder Setup for more info*
+
+### Default Folder Setup
+As is, the script will run Stanford NER on every text (.txt) file within a folder. This expects that all of the text files and the batchner.sh script are all within the same folder, and that the `stanford-ner` folder is in the same directory as the folder of files. **Make sure you have renamed the stanford-ner folder**
 
 (Note: you do not have to change the names of the .txt files—the filenames below are just for demonstration)
 
@@ -53,7 +59,6 @@ As is, the script will run Stanford NER on every text (.txt) file within a folde
 |   └──file6.txt
 |   └──etc.
 ```
-If you're familiar with shell scripting and file navigation, you can fairly easily change the script and arrange the files however you would like.
 
 ### Running the Script
 #### Mac OS X
